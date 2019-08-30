@@ -50,12 +50,11 @@ abstract class AbstractRequestHandler implements RequestHandlerInterface
      */
     protected function extractOffsetFromRequest(RequestInterface $request): ?int
     {
-        $offset = $request->paginationValue('offset');
-        if ($offset) {
-            $offset = (int)$offset;
+        if (!$request->hasPagination('offset')) {
+            return null;
         }
 
-        return $offset;
+        return (int)$request->paginationValue('offset');
     }
 
     /**
@@ -64,12 +63,11 @@ abstract class AbstractRequestHandler implements RequestHandlerInterface
      */
     protected function extractLimitFromRequest(RequestInterface $request): ?int
     {
-        $limit = $request->paginationValue('limit');
-        if ($limit) {
-            $limit = (int)$limit;
+        if (!$request->hasPagination('limit')) {
+            return null;
         }
 
-        return $limit;
+        return (int)$request->paginationValue('limit');
     }
 
     /**

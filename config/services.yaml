@@ -4,3 +4,29 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
+    App\StaticData\Presenter\StaticPersonPresenter: ~
+    App\Presenter\PersonPresenterInterface: '@App\StaticData\Presenter\StaticPersonPresenter'
+
+    App\StaticData\Presenter\StaticPostalAddressPresenter: ~
+    App\Presenter\PostalAddressPresenterInterface: '@App\StaticData\Presenter\StaticPostalAddressPresenter'
+
+    App\Api\RequestHandler\PersonHandler:
+        tags:
+            - { name: 'json_api_server.request_handler', type: 'persons' }
+
+    App\Api\RequestHandler\PostalAddressHandler:
+        tags:
+            - { name: 'json_api_server.request_handler', type: 'postalAddresses' }
+
+    App\Api\ResourceMapper\PersonMapper: ~
+
+    App\Api\ResourceMapper\PostalAddressMapper: ~
+
+    Enm\JsonApi\Mapper\ObjectResourceMapper:
+        calls:
+            - ['addResourceMapper', ['@App\Api\ResourceMapper\PersonMapper']]
+            - ['addResourceMapper', ['@App\Api\ResourceMapper\PostalAddressMapper']]
+
+
+    Enm\JsonApi\Mapper\ResourceMapperInterface: '@Enm\JsonApi\Mapper\ObjectResourceMapper'
+

@@ -44,6 +44,10 @@ class PostalAddressMapper implements ResourceMapperInterface
      */
     public function mapObject(object $object, ResourceInterface $resource, RequestInterface $request): void
     {
+        if (!$object instanceof PostalAddressInterface) {
+            return;
+        }
+
         if ($request->requestsAttributes()) {
             $resource->attributes()->set('street', $object->getStreet());
             $resource->attributes()->set('addressAdditional', $object->getAddressAdditional());
@@ -53,7 +57,7 @@ class PostalAddressMapper implements ResourceMapperInterface
         }
 
         if ($request->requestsRelationships()) {
-            $personRequest = $request->createSubRequest('person');
+            $personRequest = $request->createSubRequest('person', $resource);
             $relationship = $this->toOneRelationship('person');
 
             $related = $this->resource('persons', $object->getConnectedPersonId());

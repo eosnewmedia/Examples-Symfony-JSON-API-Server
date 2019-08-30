@@ -46,20 +46,24 @@ class PersonMapper implements ResourceMapperInterface
      */
     public function mapObject(object $object, ResourceInterface $resource, RequestInterface $request): void
     {
+        if (!$object instanceof PersonInterface) {
+            return;
+        }
+
         if ($request->requestsAttributes()) {
             $resource->attributes()->set('firstName', $object->getFirstName());
             $resource->attributes()->set('lastName', $object->getLastName());
-            $resource->attributes()->set('birthday', $object->getBirthday()->format(DATE_ATOM));
+            $resource->attributes()->set('birthday', $object->getBirthday()->format('Y-m-d'));
         }
 
         if ($request->requestsRelationships()) {
-            $postalAddressRequest = $request->createSubRequest('postalAddresses');
-            $relationship = $this->toManyRelationship('postalAddresses');
+            $postalAddressRequest = $request->createSubRequest('postalAddresses', $resource);
 
+            $relatedResources = [];
             foreach ($object->getConnectedPostalAddressIds() as $postalAddressId) {
                 $related = $this->resource('postalAddresses', $postalAddressId);
 
-                if ($request->requestsInclude('postalAddress')) {
+                if ($request->requestsInclude('postalAddresses')) {
                     $postalAddress = $this->postalAddressPresenter->showPostalAddressById($postalAddressId);
                     if (!$postalAddress) {
                         continue;
@@ -67,10 +71,12 @@ class PersonMapper implements ResourceMapperInterface
                     $this->resourceMapper->mapObject($postalAddress, $related, $postalAddressRequest);
                 }
 
-                $relationship->related()->set($related);
+                $relatedResources[] = $related;
             }
 
-            $resource->relationships()->set($relationship);
+            $resource->relationships()->set(
+                $this->toManyRelationship('postalAddresses', $relatedResources)
+            );
         }
     }
 }
