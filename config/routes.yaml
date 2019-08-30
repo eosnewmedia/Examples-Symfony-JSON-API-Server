@@ -1,0 +1,2 @@
+json_api:
+    resource: '@EnmJsonApiServerBundle/Resources/config/routing.xml'
